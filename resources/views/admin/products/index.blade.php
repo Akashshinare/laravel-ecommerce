@@ -30,8 +30,7 @@
                 <tr>
                     <th>ID</th>
                     <th>Product Name</th>
-                    <th>Category</th>
-                    <th>Brand</th>
+                    <th>Image</th>
                     <th>Original Price</th>
                     <th>Selling Price</th>
                     <th>Quantity</th>
@@ -45,8 +44,14 @@
                 <tr>
                     <td>{{ $item->id }}</td>
                     <td>{{ $item->name }}</td>
-                    <td>{{ $item->category ? $item->category->name : 'N/A' }}</td>
-                    <td>{{ $item->brand ? $item->brand->name : 'N/A' }}</td>
+                    <td>
+                        @if(isset($item->image) && file_exists(public_path($item->image)))
+                        <img src="{{ asset($item->image) }}" alt="Product Image" width="60" height="60"
+                            style="object-fit:cover; border-radius:4px;">
+                        @else
+                        <span>No Image</span>
+                        @endif
+                    </td>
                     <td>₹{{ number_format($item->original_price, 2) }}</td>
                     <td>₹{{ number_format($item->selling_price, 2) }}</td>
                     <td>{{ $item->quantity }}</td>
@@ -65,14 +70,27 @@
                         @endif
                     </td>
                     <td>
-                        <a href="{{ route('products.show', $item->id) }}" class="btn btn-info btn-sm">Show</a>
-                        <a href="{{ route('products.edit', $item->id) }}" class="btn btn-success btn-sm">Edit</a>
-                        <form action="{{ route('products.delete', $item->id) }}" method="POST" class="d-inline"
-                            onsubmit="return confirm('Are you sure you want to delete this product?');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                        </form>
+                        <div class="dropdown">
+                            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                                <i class="fa fa-list"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{{ route('products.show', $item->id) }}">Show</a>
+                                </li>
+                                <li><a class="dropdown-item" href="{{ route('products.edit', $item->id) }}">Edit</a>
+                                </li>
+                                <li><a class="dropdown-item" href="{{ route('productImages.index', $item->id) }}">Upload
+                                        Images</a></li>
+                                <li>
+                                    <form action="{{ route('products.delete', $item->id) }}" method="GET"
+                                        class="m-0 p-0">
+                                        <button type="submit" class="dropdown-item"
+                                            onclick="return confirm('Are you sure you want to delete this product?')">Delete</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
                     </td>
                 </tr>
                 @endforeach
